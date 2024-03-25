@@ -1,0 +1,21 @@
+{
+	"name": "customerjson",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "emp_blob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "customer.json",
+				"folderPath": "customer_json",
+				"container": "jsonfile"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,22 @@
+{
+	"name": "parquet_datalake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "datalake_gen_2_connection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Log.parquet",
+				"folderPath": "parquetfiles",
+				"fileSystem": "parquet"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

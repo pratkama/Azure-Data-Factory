@@ -1,0 +1,13 @@
+{
+	"name": "pratikdb_sql_server_connection",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "conn_pratik_sql_test_db",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

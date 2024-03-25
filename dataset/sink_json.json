@@ -1,0 +1,19 @@
+{
+	"name": "sink_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "emp_blob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "jsonfile"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

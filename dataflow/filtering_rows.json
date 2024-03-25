@@ -1,0 +1,134 @@
+{
+	"name": "filtering_rows",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Parquet_File",
+						"type": "DatasetReference"
+					},
+					"name": "dsparquetfile"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sinknotnull"
+				},
+				{
+					"dataset": {
+						"referenceName": "sqllogtbl",
+						"type": "DatasetReference"
+					},
+					"name": "sinknull"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filternullvalues"
+				},
+				{
+					"name": "filternotnull"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Correlationid as string,",
+				"          Operationname as string,",
+				"          Status as string,",
+				"          Eventcategory as string,",
+				"          Level as string,",
+				"          Time as string,",
+				"          Subscription as string,",
+				"          Eventinitiatedby as string,",
+				"          Resourcetype as string,",
+				"          Resourcegroup as string,",
+				"          Resource as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> dsparquetfile",
+				"dsparquetfile filter((isNull({Resourcegroup}))) ~> filternullvalues",
+				"dsparquetfile filter(!(isNull({Resourcegroup}))) ~> filternotnull",
+				"filternotnull sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Correlation id} as string,",
+				"          {Operation name} as string,",
+				"          Status as string,",
+				"          {Event category} as string,",
+				"          Level as string,",
+				"          Time as timestamp,",
+				"          Subscription as string,",
+				"          {Event initiated by} as string,",
+				"          {Resource type} as string,",
+				"          {Resource group} as string,",
+				"          Resource as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          {Correlation id} = Correlationid,",
+				"          {Operation name} = Operationname,",
+				"          Status,",
+				"          {Event category} = Eventcategory,",
+				"          Level,",
+				"          Time,",
+				"          Subscription,",
+				"          {Event initiated by} = Eventinitiatedby,",
+				"          {Resource type} = Resourcetype,",
+				"          {Resource group} = Resourcegroup,",
+				"          Resource",
+				"     )) ~> sinknotnull",
+				"filternullvalues sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Correlation id} as string,",
+				"          {Operation name} as string,",
+				"          Status as string,",
+				"          {Event category} as string,",
+				"          Level as string,",
+				"          Time as timestamp,",
+				"          Subscription as string,",
+				"          {Event initiated by} as string,",
+				"          {Resource type} as string,",
+				"          {Resource group} as string,",
+				"          Resource as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          {Correlation id} = Correlationid,",
+				"          {Operation name} = Operationname,",
+				"          Status,",
+				"          {Event category} = Eventcategory,",
+				"          Level,",
+				"          Time,",
+				"          Subscription,",
+				"          {Event initiated by} = Eventinitiatedby,",
+				"          {Resource type} = Resourcetype,",
+				"          {Resource group} = Resourcegroup,",
+				"          Resource",
+				"     )) ~> sinknull"
+			]
+		}
+	}
+}

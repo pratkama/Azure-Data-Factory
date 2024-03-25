@@ -1,0 +1,101 @@
+{
+	"name": "cache_sink_implementation",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_emp",
+						"type": "DatasetReference"
+					},
+					"name": "employeedtl"
+				},
+				{
+					"dataset": {
+						"referenceName": "empfile",
+						"type": "DatasetReference"
+					},
+					"name": "empcsvfile"
+				}
+			],
+			"sinks": [
+				{
+					"name": "cachedmaxemployeeid"
+				},
+				{
+					"dataset": {
+						"referenceName": "employee_ds",
+						"type": "DatasetReference"
+					},
+					"name": "sinkoutput"
+				}
+			],
+			"transformations": [
+				{
+					"name": "empid"
+				},
+				{
+					"name": "stream"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          employeeid as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select max(employeeid) as employeeid from  SalesLT.employee',",
+				"     format: 'query') ~> employeedtl",
+				"source(output(",
+				"          name as string,",
+				"          salary as integer,",
+				"          gender as string,",
+				"          country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empcsvfile",
+				"empcsvfile keyGenerate(output(employeeid as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> empid",
+				"empid derive(employeeid = employeeid + cachedmaxemployeeid#outputs()[1].employeeid) ~> stream",
+				"employeedtl sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1,",
+				"     mapColumn(",
+				"          employeeid",
+				"     )) ~> cachedmaxemployeeid",
+				"stream sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          employeeid as integer,",
+				"          name as string,",
+				"          salary as integer,",
+				"          gender as string,",
+				"          country as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          employeeid,",
+				"          name,",
+				"          salary,",
+				"          gender,",
+				"          country",
+				"     )) ~> sinkoutput"
+			]
+		}
+	}
+}

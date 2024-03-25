@@ -1,0 +1,9 @@
+{
+	"name": "datafactorypratik",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "34c3d070-9504-4459-b830-ab9a629e3f81",
+		"tenantId": "797ac9b7-3c69-47ba-bb57-9c776d304853"
+	}
+}
