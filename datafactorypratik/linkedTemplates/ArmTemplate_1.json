@@ -638,6 +638,77 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/maheerdemoinputfile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Maheer_Demo_Linked_Servuce",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "L_AIRPORT_ID.csv",
+						"container": "csvdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/outputmaheerdemocsv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Maheer_Demo_Linked_Servuce",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "outputairports.csv",
+						"folderPath": "output",
+						"container": "csvdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Copy_to_parquet')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1518,152 +1589,6 @@
 				"[concat(variables('factoryId'), '/datasets/empfile')]",
 				"[concat(variables('factoryId'), '/datasets/employee_ds')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/convert_parquet_to_json')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Parquet_File",
-								"type": "DatasetReference"
-							},
-							"name": "logparquetstream"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "sink_json",
-								"type": "DatasetReference"
-							},
-							"name": "sinkjson"
-						}
-					],
-					"transformations": [],
-					"scriptLines": [
-						"source(output(",
-						"          Correlationid as string,",
-						"          Operationname as string,",
-						"          Status as string,",
-						"          Eventcategory as string,",
-						"          Level as string,",
-						"          Time as string,",
-						"          Subscription as string,",
-						"          Eventinitiatedby as string,",
-						"          Resourcetype as string,",
-						"          Resourcegroup as string,",
-						"          Resource as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false,",
-						"     format: 'parquet') ~> logparquetstream",
-						"logparquetstream sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> sinkjson"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/sink_json')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dataflow_Conditional_Split')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Parquet_File",
-								"type": "DatasetReference"
-							},
-							"name": "logdataparquet"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "appgrptable",
-								"type": "DatasetReference"
-							},
-							"name": "appgrptbl"
-						}
-					],
-					"transformations": [
-						{
-							"name": "conditionalsplitappgrp"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          Correlationid as string,",
-						"          Operationname as string,",
-						"          Status as string,",
-						"          Eventcategory as string,",
-						"          Level as string,",
-						"          Time as string,",
-						"          Subscription as string,",
-						"          Eventinitiatedby as string,",
-						"          Resourcetype as string,",
-						"          Resourcegroup as string,",
-						"          Resource as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false,",
-						"     format: 'parquet') ~> logdataparquet",
-						"logdataparquet split(Resourcegroup=='app-grp',",
-						"     disjoint: false) ~> conditionalsplitappgrp@(appgrpstream, otherresourcegrps)",
-						"conditionalsplitappgrp@appgrpstream sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          {Correlation id} as string,",
-						"          {Operation name} as string,",
-						"          Status as string,",
-						"          {Event category} as string,",
-						"          Level as string,",
-						"          Time as timestamp,",
-						"          Subscription as string,",
-						"          {Event initiated by} as string,",
-						"          {Resource type} as string,",
-						"          {Resource group} as string,",
-						"          Resource as string",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          {Correlation id} = Correlationid,",
-						"          {Operation name} = Operationname,",
-						"          Status,",
-						"          {Event category} = Status,",
-						"          Level,",
-						"          Time,",
-						"          Subscription,",
-						"          {Event initiated by} = Eventinitiatedby,",
-						"          {Resource type} = Resourcetype,",
-						"          {Resource group} = Resourcegroup,",
-						"          Resource",
-						"     )) ~> appgrptbl"
-					]
-				}
-			},
-			"dependsOn": []
 		}
 	]
 }
