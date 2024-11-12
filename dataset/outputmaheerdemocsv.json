@@ -1,0 +1,33 @@
+{
+	"name": "outputmaheerdemocsv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Maheer_Demo_Linked_Servuce",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "outputairports.csv",
+				"folderPath": "output",
+				"container": "csvdemo"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Code",
+				"type": "String"
+			},
+			{
+				"name": "Description",
+				"type": "String"
+			}
+		]
+	}
+}
