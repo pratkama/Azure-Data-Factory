@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "datafactorypratik"
+		},
+		"conn_pratik_sql_test_db_connectionString": {
+			"value": ""
+		},
+		"datalake_gen_2_connection_accountKey": {
+			"value": ""
+		},
+		"datalake_synapse_connection_connectionString": {
+			"value": ""
+		},
+		"emp_blob_connectionString": {
+			"value": ""
+		},
+		"temp_staging_accountKey": {
+			"value": ""
+		},
+		"Maheer_Demo_Linked_Servuce_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"datalake_gen_2_connection_properties_typeProperties_url": {
+			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"temp_staging_properties_typeProperties_url": {
+			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
+		}
+	}
+}
