@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactorypratik"
 		},
+		"Maheer_Demo_Linked_Servuce_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Maheer_Demo_Linked_Servuce'"
+		},
 		"conn_pratik_sql_test_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'conn_pratik_sql_test_db'"
@@ -27,9 +31,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'temp_staging'"
 		},
-		"Maheer_Demo_Linked_Servuce_connectionString": {
+		"linkedservicesql_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'Maheer_Demo_Linked_Servuce'"
+			"metadata": "Secure string for 'password' of 'linkedservicesql'"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -42,6 +46,18 @@
 		"temp_staging_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"linkedservicesql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "pratiksqldb.database.windows.net"
+		},
+		"linkedservicesql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbname}"
+		},
+		"linkedservicesql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "pratiksqldb"
 		}
 	},
 	"variables": {
@@ -57,6 +73,19 @@
 				"type": "AzureBlobFS",
 				"typeProperties": {
 					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Maheer_Demo_Linked_Servuce')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Maheer_Demo_Linked_Servuce_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -135,14 +164,28 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Maheer_Demo_Linked_Servuce')]",
+			"name": "[concat(parameters('factoryName'), '/linkedservicesql')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"dbname": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
-				"type": "AzureBlobStorage",
+				"type": "SqlServer",
 				"typeProperties": {
-					"connectionString": "[parameters('Maheer_Demo_Linked_Servuce_connectionString')]"
+					"server": "[parameters('linkedservicesql_properties_typeProperties_server')]",
+					"database": "[parameters('linkedservicesql_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('linkedservicesql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('linkedservicesql_password')]"
+					}
 				}
 			},
 			"dependsOn": []
@@ -977,74 +1020,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/datalake_gen_2_connection')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/appgrptable')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "conn_pratik_sql_test_db",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "Correlation id",
-						"type": "varchar"
-					},
-					{
-						"name": "Operation name",
-						"type": "varchar"
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "Event category",
-						"type": "varchar"
-					},
-					{
-						"name": "Level",
-						"type": "varchar"
-					},
-					{
-						"name": "Time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Subscription",
-						"type": "varchar"
-					},
-					{
-						"name": "Event initiated by",
-						"type": "varchar"
-					},
-					{
-						"name": "Resource type",
-						"type": "varchar"
-					},
-					{
-						"name": "Resource group",
-						"type": "varchar"
-					},
-					{
-						"name": "Resource",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "conditionalsplit"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/conn_pratik_sql_test_db')]"
 			]
 		}
 	]

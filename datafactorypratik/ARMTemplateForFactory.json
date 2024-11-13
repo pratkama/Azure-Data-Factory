@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactorypratik"
 		},
+		"Maheer_Demo_Linked_Servuce_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Maheer_Demo_Linked_Servuce'"
+		},
 		"conn_pratik_sql_test_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'conn_pratik_sql_test_db'"
@@ -27,9 +31,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'temp_staging'"
 		},
-		"Maheer_Demo_Linked_Servuce_connectionString": {
+		"linkedservicesql_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'Maheer_Demo_Linked_Servuce'"
+			"metadata": "Secure string for 'password' of 'linkedservicesql'"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -42,6 +46,18 @@
 		"temp_staging_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"linkedservicesql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "pratiksqldb.database.windows.net"
+		},
+		"linkedservicesql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbname}"
+		},
+		"linkedservicesql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "pratiksqldb"
 		}
 	},
 	"variables": {
@@ -769,6 +785,109 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/dataflow_DimProduct')]",
 				"[concat(variables('factoryId'), '/linkedServices/temp_staging')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copymaheerdemo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copymaheerdemo_pipeline_lecture1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Code",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Code",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "maheerdemoinputfile",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "outputmaheerdemocsv",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/maheerdemoinputfile')]",
+				"[concat(variables('factoryId'), '/datasets/outputmaheerdemocsv')]"
 			]
 		},
 		{
@@ -2376,6 +2495,43 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/maheerdemoinputfile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Maheer_Demo_Linked_Servuce",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "L_AIRPORT_ID.csv",
+						"container": "csvdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Maheer_Demo_Linked_Servuce')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/output_logdata')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2441,6 +2597,44 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/conn_pratik_sql_test_db')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/outputmaheerdemocsv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Maheer_Demo_Linked_Servuce",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "outputairports.csv",
+						"folderPath": "output",
+						"container": "csvdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Maheer_Demo_Linked_Servuce')]"
 			]
 		},
 		{
@@ -2785,6 +2979,19 @@
 				"type": "AzureBlobFS",
 				"typeProperties": {
 					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Maheer_Demo_Linked_Servuce')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Maheer_Demo_Linked_Servuce_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -3695,101 +3902,78 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Maheer_Demo_Linked_Servuce')]",
+			"name": "[concat(parameters('factoryName'), '/linkedservicesql')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"dbname": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
-				"type": "AzureBlobStorage",
+				"type": "SqlServer",
 				"typeProperties": {
-					"connectionString": "[parameters('Maheer_Demo_Linked_Servuce_connectionString')]"
+					"server": "[parameters('linkedservicesql_properties_typeProperties_server')]",
+					"database": "[parameters('linkedservicesql_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('linkedservicesql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('linkedservicesql_password')]"
+					}
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/maheerdemoinputfile')]",
+			"name": "[concat(parameters('factoryName'), '/datasetsqltable')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Maheer_Demo_Linked_Servuce",
-					"type": "LinkedServiceReference"
+					"referenceName": "linkedservicesql",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"dbname": {
+							"value": "@dataset().dbnamescope",
+							"type": "Expression"
+						}
+					}
 				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "L_AIRPORT_ID.csv",
-						"container": "csvdemo"
+				"parameters": {
+					"tablename": {
+						"type": "string"
 					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "Code",
-						"type": "String"
-					},
-					{
-						"name": "Description",
+					"dbnamescope": {
 						"type": "String"
 					}
-				]
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().tablename",
+						"type": "Expression"
+					}
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Maheer_Demo_Linked_Servuce')]"
+				"[concat(variables('factoryId'), '/linkedServices/linkedservicesql')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/outputmaheerdemocsv')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Maheer_Demo_Linked_Servuce",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "outputairports.csv",
-						"folderPath": "output",
-						"container": "csvdemo"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "Code",
-						"type": "String"
-					},
-					{
-						"name": "Description",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Maheer_Demo_Linked_Servuce')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/copymaheerdemo')]",
+			"name": "[concat(parameters('factoryName'), '/parametrizepipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "copymaheerdemo_pipeline_lecture1",
+						"name": "Copy data1",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -3802,56 +3986,18 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
+								"type": "SqlServerSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
 							},
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "Code",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Code",
-											"type": "String",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "Description",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Description",
-											"type": "String",
-											"physicalType": "String"
-										}
-									}
-								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
@@ -3861,16 +4007,34 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "maheerdemoinputfile",
+								"referenceName": "datasetsqltable",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"tablename": {
+										"value": "@pipeline().parameters.sourcetable",
+										"type": "Expression"
+									},
+									"dbnamescope": {
+										"value": "@pipeline().parameters.dbnamefrompipeline",
+										"type": "Expression"
+									}
+								}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "outputmaheerdemocsv",
+								"referenceName": "datasetsqltable",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"tablename": {
+										"value": "@pipeline().parameters.destinationtbl",
+										"type": "Expression"
+									},
+									"dbnamescope": {
+										"value": "@pipeline().parameters.dbnamefrompipeline",
+										"type": "Expression"
+									}
+								}
 							}
 						]
 					}
@@ -3878,11 +4042,21 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"sourcetable": {
+						"type": "string"
+					},
+					"dbnamefrompipeline": {
+						"type": "string"
+					},
+					"destinationtbl": {
+						"type": "string"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/maheerdemoinputfile')]",
-				"[concat(variables('factoryId'), '/datasets/outputmaheerdemocsv')]"
+				"[concat(variables('factoryId'), '/datasets/datasetsqltable')]"
 			]
 		}
 	]

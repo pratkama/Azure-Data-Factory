@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactorypratik"
 		},
+		"Maheer_Demo_Linked_Servuce_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Maheer_Demo_Linked_Servuce'"
+		},
 		"conn_pratik_sql_test_db_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'conn_pratik_sql_test_db'"
@@ -27,9 +31,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'temp_staging'"
 		},
-		"Maheer_Demo_Linked_Servuce_connectionString": {
+		"linkedservicesql_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'Maheer_Demo_Linked_Servuce'"
+			"metadata": "Secure string for 'password' of 'linkedservicesql'"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -42,6 +46,18 @@
 		"temp_staging_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"linkedservicesql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "pratiksqldb.database.windows.net"
+		},
+		"linkedservicesql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbname}"
+		},
+		"linkedservicesql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "pratiksqldb"
 		},
 		"containerUri": {
 			"type": "string",
@@ -70,6 +86,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"Maheer_Demo_Linked_Servuce_connectionString": {
+						"value": "[parameters('Maheer_Demo_Linked_Servuce_connectionString')]"
+					},
 					"conn_pratik_sql_test_db_connectionString": {
 						"value": "[parameters('conn_pratik_sql_test_db_connectionString')]"
 					},
@@ -85,8 +104,8 @@
 					"temp_staging_accountKey": {
 						"value": "[parameters('temp_staging_accountKey')]"
 					},
-					"Maheer_Demo_Linked_Servuce_connectionString": {
-						"value": "[parameters('Maheer_Demo_Linked_Servuce_connectionString')]"
+					"linkedservicesql_password": {
+						"value": "[parameters('linkedservicesql_password')]"
 					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
@@ -96,6 +115,15 @@
 					},
 					"temp_staging_properties_typeProperties_url": {
 						"value": "[parameters('temp_staging_properties_typeProperties_url')]"
+					},
+					"linkedservicesql_properties_typeProperties_server": {
+						"value": "[parameters('linkedservicesql_properties_typeProperties_server')]"
+					},
+					"linkedservicesql_properties_typeProperties_database": {
+						"value": "[parameters('linkedservicesql_properties_typeProperties_database')]"
+					},
+					"linkedservicesql_properties_typeProperties_userName": {
+						"value": "[parameters('linkedservicesql_properties_typeProperties_userName')]"
 					}
 				}
 			},

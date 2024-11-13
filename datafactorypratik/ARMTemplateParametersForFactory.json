@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "datafactorypratik"
 		},
+		"Maheer_Demo_Linked_Servuce_connectionString": {
+			"value": ""
+		},
 		"conn_pratik_sql_test_db_connectionString": {
 			"value": ""
 		},
@@ -20,7 +23,7 @@
 		"temp_staging_accountKey": {
 			"value": ""
 		},
-		"Maheer_Demo_Linked_Servuce_connectionString": {
+		"linkedservicesql_password": {
 			"value": ""
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
@@ -31,6 +34,15 @@
 		},
 		"temp_staging_properties_typeProperties_url": {
 			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"linkedservicesql_properties_typeProperties_server": {
+			"value": "pratiksqldb.database.windows.net"
+		},
+		"linkedservicesql_properties_typeProperties_database": {
+			"value": "@{linkedService().dbname}"
+		},
+		"linkedservicesql_properties_typeProperties_userName": {
+			"value": "pratiksqldb"
 		}
 	}
 }
