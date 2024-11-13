@@ -3993,7 +3993,8 @@
 							"sink": {
 								"type": "SqlServerSink",
 								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate"
 							},
 							"enableStaging": false,
 							"translator": {
