@@ -1,0 +1,58 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "parametrizepipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"sourcetable": {
+							"value": "@pipeline().parameters.SourceTable",
+							"type": "Expression"
+						},
+						"dbnamefrompipeline": {
+							"value": "@pipeline().parameters.DBname",
+							"type": "Expression"
+						},
+						"destinationtbl": {
+							"value": "@pipeline().parameters.DestTable",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"DBname": {
+				"type": "string",
+				"defaultValue": "DailySales"
+			},
+			"SourceTable": {
+				"type": "string"
+			},
+			"DestTable": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"FileType": {
+				"type": "String"
+			},
+			"ListofFiles": {
+				"type": "Array"
+			}
+		},
+		"annotations": []
+	}
+}
