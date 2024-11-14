@@ -20,19 +20,16 @@
 		"emp_blob_connectionString": {
 			"value": ""
 		},
-		"temp_staging_accountKey": {
+		"linkedservicesql_password": {
 			"value": ""
 		},
-		"linkedservicesql_password": {
+		"temp_staging_accountKey": {
 			"value": ""
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
 		},
 		"datalake_gen_2_connection_properties_typeProperties_url": {
-			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
-		},
-		"temp_staging_properties_typeProperties_url": {
 			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
 		},
 		"linkedservicesql_properties_typeProperties_server": {
@@ -43,6 +40,9 @@
 		},
 		"linkedservicesql_properties_typeProperties_userName": {
 			"value": "pratiksqldb"
+		},
+		"temp_staging_properties_typeProperties_url": {
+			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"value": ""
