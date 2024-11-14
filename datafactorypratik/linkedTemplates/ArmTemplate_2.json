@@ -1413,6 +1413,10 @@
 								"destinationtbl": {
 									"value": "@pipeline().parameters.DestTable",
 									"type": "Expression"
+								},
+								"schemaname": {
+									"value": "@pipeline().parameters.schemaname",
+									"type": "Expression"
 								}
 							}
 						}
@@ -1431,14 +1435,9 @@
 					},
 					"DestTable": {
 						"type": "string"
-					}
-				},
-				"variables": {
-					"FileType": {
-						"type": "String"
 					},
-					"ListofFiles": {
-						"type": "Array"
+					"schemaname": {
+						"type": "string"
 					}
 				},
 				"annotations": []
