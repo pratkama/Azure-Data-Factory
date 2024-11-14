@@ -79,6 +79,9 @@
 			},
 			"destinationtbl": {
 				"type": "string"
+			},
+			"schemaname": {
+				"type": "string"
 			}
 		},
 		"annotations": []
