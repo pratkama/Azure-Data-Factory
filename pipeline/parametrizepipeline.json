@@ -48,6 +48,10 @@
 							"dbnamescope": {
 								"value": "@pipeline().parameters.dbnamefrompipeline",
 								"type": "Expression"
+							},
+							"schemaname": {
+								"value": "@pipeline().parameters.schemaname",
+								"type": "Expression"
 							}
 						}
 					}
@@ -63,6 +67,10 @@
 							},
 							"dbnamescope": {
 								"value": "@pipeline().parameters.dbnamefrompipeline",
+								"type": "Expression"
+							},
+							"schemaname": {
+								"value": "@pipeline().parameters.schemaname",
 								"type": "Expression"
 							}
 						}
