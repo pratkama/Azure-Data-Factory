@@ -56,6 +56,14 @@
 							"password": {
 								"value": "@pipeline().parameters.password",
 								"type": "Expression"
+							},
+							"schemaname": {
+								"value": "@pipeline().parameters.schmnm",
+								"type": "Expression"
+							},
+							"tablenm": {
+								"value": "@pipeline().parameters.src_tblnm",
+								"type": "Expression"
 							}
 						}
 					}
@@ -63,7 +71,33 @@
 				"outputs": [
 					{
 						"referenceName": "azure_dynamic_sql_ds",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"servername": {
+								"value": "@pipeline().parameters.servername",
+								"type": "Expression"
+							},
+							"dbname": {
+								"value": "@pipeline().parameters.dbname",
+								"type": "Expression"
+							},
+							"username": {
+								"value": "@pipeline().parameters.username",
+								"type": "Expression"
+							},
+							"password": {
+								"value": "@pipeline().parameters.password",
+								"type": "Expression"
+							},
+							"schemaname": {
+								"value": "@pipeline().parameters.schmnm",
+								"type": "Expression"
+							},
+							"tablenm": {
+								"value": "@pipeline().parameters.tgt_tblnm",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
@@ -79,6 +113,15 @@
 				"type": "string"
 			},
 			"password": {
+				"type": "string"
+			},
+			"schmnm": {
+				"type": "string"
+			},
+			"src_tblnm": {
+				"type": "string"
+			},
+			"tgt_tblnm": {
 				"type": "string"
 			}
 		},
