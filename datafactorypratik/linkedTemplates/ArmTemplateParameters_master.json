@@ -41,6 +41,15 @@
 		"linkedservicesql_properties_typeProperties_userName": {
 			"value": "pratiksqldb"
 		},
+		"ls_azure_sqldb_properties_typeProperties_server": {
+			"value": "@{linkedService().servername}"
+		},
+		"ls_azure_sqldb_properties_typeProperties_database": {
+			"value": "@{linkedService().dbname}"
+		},
+		"ls_azure_sqldb_properties_typeProperties_userName": {
+			"value": "@{linkedService().db_username}"
+		},
 		"temp_staging_properties_typeProperties_url": {
 			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
 		},

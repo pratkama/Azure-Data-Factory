@@ -55,6 +55,18 @@
 			"type": "string",
 			"defaultValue": "pratiksqldb"
 		},
+		"ls_azure_sqldb_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().servername}"
+		},
+		"ls_azure_sqldb_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbname}"
+		},
+		"ls_azure_sqldb_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().db_username}"
+		},
 		"temp_staging_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
@@ -1208,6 +1220,144 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/datasetsqltable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"isolationLevel": "ReadCommitted",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "azure_dynamic_sql_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"servername": {
+										"value": "@pipeline().parameters.servername",
+										"type": "Expression"
+									},
+									"dbname": {
+										"value": "@pipeline().parameters.dbname",
+										"type": "Expression"
+									},
+									"username": {
+										"value": "@pipeline().parameters.username",
+										"type": "Expression"
+									},
+									"password": {
+										"value": "@pipeline().parameters.password",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schmnm",
+										"type": "Expression"
+									},
+									"tablenm": {
+										"value": "@pipeline().parameters.src_tblnm",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "azure_dynamic_sql_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"servername": {
+										"value": "@pipeline().parameters.servername",
+										"type": "Expression"
+									},
+									"dbname": {
+										"value": "@pipeline().parameters.dbname",
+										"type": "Expression"
+									},
+									"username": {
+										"value": "@pipeline().parameters.username",
+										"type": "Expression"
+									},
+									"password": {
+										"value": "@pipeline().parameters.password",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schmnm",
+										"type": "Expression"
+									},
+									"tablenm": {
+										"value": "@pipeline().parameters.tgt_tblnm",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"servername": {
+						"type": "string"
+					},
+					"dbname": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"schmnm": {
+						"type": "string"
+					},
+					"src_tblnm": {
+						"type": "string"
+					},
+					"tgt_tblnm": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]"
 			]
 		},
 		{
@@ -2413,6 +2563,71 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/azure_dynamic_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_azure_sqldb",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"servername": {
+							"value": "@dataset().servername",
+							"type": "Expression"
+						},
+						"dbname": {
+							"value": "@dataset().dbname",
+							"type": "Expression"
+						},
+						"db_username": {
+							"value": "@dataset().username",
+							"type": "Expression"
+						},
+						"db_password": {
+							"value": "@dataset().password",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"servername": {
+						"type": "string"
+					},
+					"dbname": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"schemaname": {
+						"type": "String"
+					},
+					"tablenm": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().schemaname",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().tablenm",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_azure_sqldb')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/customerjson')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -3289,6 +3504,40 @@
 						"type": "SecureString",
 						"value": "[parameters('linkedservicesql_password')]"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_azure_sqldb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"servername": {
+						"type": "String",
+						"defaultValue": "@"
+					},
+					"dbname": {
+						"type": "String"
+					},
+					"db_username": {
+						"type": "String"
+					},
+					"db_password": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ls_azure_sqldb_properties_typeProperties_server')]",
+					"database": "[parameters('ls_azure_sqldb_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ls_azure_sqldb_properties_typeProperties_userName')]",
+					"password": "@{linkedService().db_password}"
 				}
 			},
 			"dependsOn": []

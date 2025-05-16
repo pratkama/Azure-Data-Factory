@@ -55,6 +55,18 @@
 			"type": "string",
 			"defaultValue": "pratiksqldb"
 		},
+		"ls_azure_sqldb_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().servername}"
+		},
+		"ls_azure_sqldb_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbname}"
+		},
+		"ls_azure_sqldb_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().db_username}"
+		},
 		"temp_staging_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
@@ -122,6 +134,15 @@
 					"linkedservicesql_properties_typeProperties_userName": {
 						"value": "[parameters('linkedservicesql_properties_typeProperties_userName')]"
 					},
+					"ls_azure_sqldb_properties_typeProperties_server": {
+						"value": "[parameters('ls_azure_sqldb_properties_typeProperties_server')]"
+					},
+					"ls_azure_sqldb_properties_typeProperties_database": {
+						"value": "[parameters('ls_azure_sqldb_properties_typeProperties_database')]"
+					},
+					"ls_azure_sqldb_properties_typeProperties_userName": {
+						"value": "[parameters('ls_azure_sqldb_properties_typeProperties_userName')]"
+					},
 					"temp_staging_properties_typeProperties_url": {
 						"value": "[parameters('temp_staging_properties_typeProperties_url')]"
 					}
@@ -167,6 +188,26 @@
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'datafactorypratik_ArmTemplate_1')]"
+			]
+		},
+		{
+			"name": "datafactorypratik_ArmTemplate_3",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_3.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'datafactorypratik_ArmTemplate_2')]"
 			]
 		}
 	]
