@@ -3,7 +3,10 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azure_sqldb",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"servername": "@"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
