@@ -1,0 +1,12 @@
+{
+	"name": "azure_dynamic_sql_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azure_sqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
