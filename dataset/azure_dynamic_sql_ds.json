@@ -5,7 +5,7 @@
 			"referenceName": "ls_azure_sqldb",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"servername": "@"
+				"servername": "@p"
 			}
 		},
 		"annotations": [],
