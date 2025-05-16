@@ -35,10 +35,26 @@
 			},
 			"password": {
 				"type": "string"
+			},
+			"schemaname": {
+				"type": "String"
+			},
+			"tablenm": {
+				"type": "String"
 			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schemaname",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tablenm",
+				"type": "Expression"
+			}
+		}
 	}
 }
