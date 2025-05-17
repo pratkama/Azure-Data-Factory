@@ -1323,7 +1323,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(activity('lkp_get_query_txt').output.value.query_txt,'where ',activity('lkp_get_query_txt').output.value.query_cond,'>=',substring(activity('lkp_get_reporting_dt').output.value.reporting_end_dt,1,8))",
+												"value": "@concat(activity('lkp_get_query_txt').output.value.query_txt,'where ',activity('lkp_get_query_txt').output.value.query_cond,'>= ''''',concat(substring(activity('lkp_get_reporting_dt').output.value,1,8),'-01'),'''')",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -1429,7 +1429,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select reporting_dt from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
+									"value": "@concat('select CONVERT(char(10),reporting_end_dt,126) from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
