@@ -1303,7 +1303,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('lkp_get_query_txt').output",
+								"value": "@activity('lkp_get_query_txt').output.value",
 								"type": "Expression"
 							},
 							"activities": [
