@@ -144,10 +144,6 @@
 										"schemaname": {
 											"value": "@pipeline().parameters.schmnm",
 											"type": "Expression"
-										},
-										"tablenm": {
-											"value": "@pipeline().parameters.src_tblnm",
-											"type": "Expression"
 										}
 									}
 								}
