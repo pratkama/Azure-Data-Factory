@@ -77,7 +77,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('lkp_get_query_txt').output",
+						"value": "@activity('lkp_get_query_txt').output.firstRow",
 						"type": "Expression"
 					},
 					"activities": [
@@ -144,6 +144,10 @@
 										},
 										"schemaname": {
 											"value": "@pipeline().parameters.schmnm",
+											"type": "Expression"
+										},
+										"tablenm": {
+											"value": "@pipeline().parameters.src_tblnm",
 											"type": "Expression"
 										}
 									}
