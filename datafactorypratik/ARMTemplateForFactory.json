@@ -1229,8 +1229,193 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Copy data1",
-						"type": "Copy",
+						"name": "lkp_get_query_txt",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "lkp_get_reporting_dt",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select query_txt,query_cond\nfrom ',pipeline().parameters.schmnm,'where actv_ind = ''Y''')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "azure_dynamic_sql_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"servername": {
+										"value": "@pipeline().parameters.servername",
+										"type": "Expression"
+									},
+									"dbname": {
+										"value": "@pipeline().parameters.dbname",
+										"type": "Expression"
+									},
+									"username": {
+										"value": "@pipeline().parameters.username",
+										"type": "Expression"
+									},
+									"password": {
+										"value": "@pipeline().parameters.password",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schmnm",
+										"type": "Expression"
+									},
+									"tablenm": {
+										"value": "@pipeline().parameters.mtdt_tbl_nm",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "lkp_get_query_txt",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('lkp_get_query_txt').output",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "copy_sql_data",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat(activity('lkp_get_query_txt').output.value.query_txt,'where ',activity('lkp_get_query_txt').output.value.query_cond,'>=',substring(activity('lkp_get_reporting_dt').output.value.reporting_end_dt,1,8))",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"isolationLevel": "ReadCommitted",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "azure_dynamic_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"servername": {
+													"value": "@pipeline().parameters.servername",
+													"type": "Expression"
+												},
+												"dbname": {
+													"value": "@pipeline().parameters.dbname",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().parameters.username",
+													"type": "Expression"
+												},
+												"password": {
+													"value": "@pipeline().parameters.password",
+													"type": "Expression"
+												},
+												"schemaname": {
+													"value": "@pipeline().parameters.schmnm",
+													"type": "Expression"
+												},
+												"tablenm": {
+													"value": "@pipeline().parameters.src_tblnm",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "azure_dynamic_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"servername": {
+													"value": "@pipeline().parameters.servername",
+													"type": "Expression"
+												},
+												"dbname": {
+													"value": "@pipeline().parameters.dbname",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().parameters.username",
+													"type": "Expression"
+												},
+												"password": {
+													"value": "@pipeline().parameters.password",
+													"type": "Expression"
+												},
+												"schemaname": {
+													"value": "@pipeline().parameters.schmnm",
+													"type": "Expression"
+												},
+												"tablenm": {
+													"value": "@pipeline().parameters.tgt_tblnm",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "lkp_get_reporting_dt",
+						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -1243,27 +1428,14 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select reporting_dt from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
-								"isolationLevel": "ReadCommitted",
 								"partitionOption": "None"
 							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
+							"dataset": {
 								"referenceName": "azure_dynamic_sql_ds",
 								"type": "DatasetReference",
 								"parameters": {
@@ -1288,44 +1460,12 @@
 										"type": "Expression"
 									},
 									"tablenm": {
-										"value": "@pipeline().parameters.src_tblnm",
+										"value": "@pipeline().parameters.mastr_cntrl_tbl",
 										"type": "Expression"
 									}
 								}
 							}
-						],
-						"outputs": [
-							{
-								"referenceName": "azure_dynamic_sql_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"servername": {
-										"value": "@pipeline().parameters.servername",
-										"type": "Expression"
-									},
-									"dbname": {
-										"value": "@pipeline().parameters.dbname",
-										"type": "Expression"
-									},
-									"username": {
-										"value": "@pipeline().parameters.username",
-										"type": "Expression"
-									},
-									"password": {
-										"value": "@pipeline().parameters.password",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schmnm",
-										"type": "Expression"
-									},
-									"tablenm": {
-										"value": "@pipeline().parameters.tgt_tblnm",
-										"type": "Expression"
-									}
-								}
-							}
-						]
+						}
 					}
 				],
 				"policy": {
@@ -1351,6 +1491,12 @@
 						"type": "string"
 					},
 					"tgt_tblnm": {
+						"type": "string"
+					},
+					"mtdt_tbl_nm": {
+						"type": "string"
+					},
+					"mastr_cntrl_tbl": {
 						"type": "string"
 					}
 				},
