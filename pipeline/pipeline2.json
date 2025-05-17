@@ -25,7 +25,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select query_txt,query_cond\nfrom ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm,' where actv_ind = ''Y''')",
+							"value": "@concat('select query_txt,query_cond,tgt_tbl_nm \nfrom ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm,' where actv_ind = ''Y''')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -64,7 +64,7 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "loop_each_tbl_qry",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -97,7 +97,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat(activity('lkp_get_query_txt').output.value.query_txt,' where ',activity('lkp_get_query_txt').output.value.query_cond,'>= ''''',concat(substring(activity('lkp_get_reporting_dt').output.value,1,8),'-01'),'''',' and ',activity('lkp_get_query_txt').output.value.query_cond,'<',activity('lkp_get_reporting_dt').output)",
+										"value": "@concat(activity('lkp_get_query_txt').output.value.query_txt,' where ',activity('lkp_get_query_txt').output.value.query_cond,'>= ''''',concat(substring(activity('lkp_get_reporting_dt').output.value,1,8),'-01'),'''',' and ',activity('lkp_get_query_txt').output.value.query_cond,'<',activity('lkp_get_reporting_dt').output,' and actv_ind = ''Y''')",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -107,7 +107,8 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
+									"sqlWriterUseTableLock": true,
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {
@@ -177,7 +178,7 @@
 											"type": "Expression"
 										},
 										"tablenm": {
-											"value": "@pipeline().parameters.tgt_tblnm",
+											"value": "@activity('lkp_get_query_txt').output.value.tgt_tbl_nm",
 											"type": "Expression"
 										}
 									}
