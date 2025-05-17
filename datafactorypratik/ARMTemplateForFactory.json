@@ -1231,14 +1231,7 @@
 					{
 						"name": "lkp_get_query_txt",
 						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "lkp_get_reporting_dt",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1286,7 +1279,8 @@
 										"type": "Expression"
 									}
 								}
-							}
+							},
+							"firstRowOnly": false
 						}
 					},
 					{
@@ -1310,7 +1304,14 @@
 								{
 									"name": "copy_sql_data",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "lkp_get_reporting_dt",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -1323,7 +1324,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(activity('lkp_get_query_txt').output.value.query_txt,' where ',activity('lkp_get_query_txt').output.value.query_cond,'>= ''''',concat(substring(activity('lkp_get_reporting_dt').output.value,1,8),'-01'),'''',' and ',activity('lkp_get_query_txt').output.value.query_cond,'<',activity('lkp_get_reporting_dt').output,' and actv_ind = ''Y''')",
+												"value": "@concat(item().query_txt,' where ',item().query_cond,'>= ''''',concat(substring(activity('lkp_get_reporting_dt').output.value,1,8),'-01'),'''',' and ',item().query_cond,'<',activity('lkp_get_reporting_dt').output.value)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -1405,68 +1406,68 @@
 													"type": "Expression"
 												},
 												"tablenm": {
-													"value": "@activity('lkp_get_query_txt').output.value.tgt_tbl_nm",
+													"value": "@item().tgt_tbl_nm",
 													"type": "Expression"
 												}
 											}
 										}
 									]
-								}
-							]
-						}
-					},
-					{
-						"name": "lkp_get_reporting_dt",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select CONVERT(char(10),reporting_end_dt,126) from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
-									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "azure_dynamic_sql_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"servername": {
-										"value": "@pipeline().parameters.servername",
-										"type": "Expression"
+								{
+									"name": "lkp_get_reporting_dt",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
 									},
-									"dbname": {
-										"value": "@pipeline().parameters.dbname",
-										"type": "Expression"
-									},
-									"username": {
-										"value": "@pipeline().parameters.username",
-										"type": "Expression"
-									},
-									"password": {
-										"value": "@pipeline().parameters.password",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schmnm",
-										"type": "Expression"
-									},
-									"tablenm": {
-										"value": "@pipeline().parameters.mastr_cntrl_tbl",
-										"type": "Expression"
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat('select CONVERT(char(10),reporting_end_dt,126) from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "azure_dynamic_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"servername": {
+													"value": "@pipeline().parameters.servername",
+													"type": "Expression"
+												},
+												"dbname": {
+													"value": "@pipeline().parameters.dbname",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().parameters.username",
+													"type": "Expression"
+												},
+												"password": {
+													"value": "@pipeline().parameters.password",
+													"type": "Expression"
+												},
+												"schemaname": {
+													"value": "@pipeline().parameters.schmnm",
+													"type": "Expression"
+												},
+												"tablenm": {
+													"value": "@pipeline().parameters.mastr_cntrl_tbl",
+													"type": "Expression"
+												}
+											}
+										}
 									}
 								}
-							}
+							]
 						}
 					}
 				],
