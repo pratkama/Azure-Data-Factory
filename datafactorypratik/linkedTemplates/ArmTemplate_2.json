@@ -927,7 +927,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(item().query_txt,' where ',item().query_cond,'>= ''''',concat(substring(activity('lkp_get_reporting_dt').output.reporting_end_dt,1,8),'-01'),'''',' and ',item().query_cond,'<',activity('lkp_get_reporting_dt').output.reporting_end_dt)",
+												"value": "@concat(item().query_txt,' where ',item().query_cond,' >= ','''',activity('lkp_get_reporting_dt').output.value)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
