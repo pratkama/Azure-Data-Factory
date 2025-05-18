@@ -1,0 +1,34 @@
+{
+	"name": "trigger_pipleine2",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pipeline2",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"servername": "pratiksqldb.database.windows.net",
+					"dbname": "pratik_test_db",
+					"username": "pratiksqldb",
+					"password": "Pratik@123",
+					"schmnm": "SalesLT",
+					"mtdt_tbl_nm": "mtdt_retrive_query",
+					"mastr_cntrl_tbl": "master_cntrl_tbl"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 60,
+				"startTime": "2025-05-17T10:20:00",
+				"endTime": "2025-05-17T16:46:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}
