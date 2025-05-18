@@ -1334,7 +1334,7 @@
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "lkp_get_reporting_dt",
+											"activity": "Set variable1",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1352,7 +1352,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(item().query_txt,' where ',item().query_cond,' >= ','''',activity('lkp_get_reporting_dt').output.value,'''')",
+												"value": "@concat(item().query_txt,' where ',item().query_cond,' >=','''',variables('reporting_end_dt'),'''')",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -1493,7 +1493,31 @@
 												}
 											}
 										},
-										"firstRowOnly": false
+										"firstRowOnly": true
+									}
+								},
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "lkp_get_reporting_dt",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "reporting_end_dt",
+										"value": {
+											"value": "@{activity('lkp_get_reporting_dt').output.firstRow.reporting_end_dt}",
+											"type": "Expression"
+										}
 									}
 								}
 							]
@@ -1530,6 +1554,11 @@
 					},
 					"mastr_cntrl_tbl": {
 						"type": "string"
+					}
+				},
+				"variables": {
+					"reporting_end_dt": {
+						"type": "String"
 					}
 				},
 				"annotations": []
