@@ -239,7 +239,7 @@
 										}
 									}
 								},
-								"firstRowOnly": false
+								"firstRowOnly": true
 							}
 						},
 						{
@@ -261,7 +261,7 @@
 							"typeProperties": {
 								"variableName": "reporting_end_dt",
 								"value": {
-									"value": "\\'@{activity('lkp_get_reporting_dt').output.reporting_end_dt}\\'",
+									"value": "\\'@{activity('lkp_get_reporting_dt').output.firstRow}\\'",
 									"type": "Expression"
 								}
 							}
