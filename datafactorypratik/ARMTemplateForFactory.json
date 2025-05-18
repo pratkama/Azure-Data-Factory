@@ -70,6 +70,34 @@
 		"temp_staging_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_servername": {
+			"type": "string",
+			"defaultValue": "pratiksqldb.database.windows.net"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_dbname": {
+			"type": "string",
+			"defaultValue": "pratik_test_db"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_username": {
+			"type": "string",
+			"defaultValue": "pratiksqldb"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_password": {
+			"type": "string",
+			"defaultValue": "Pratik@123"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_schmnm": {
+			"type": "string",
+			"defaultValue": "SalesLT"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_mtdt_tbl_nm": {
+			"type": "string",
+			"defaultValue": "mtdt_retrive_query"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_mastr_cntrl_tbl": {
+			"type": "string",
+			"defaultValue": "master_cntrl_tbl"
 		}
 	},
 	"variables": {
@@ -3708,6 +3736,45 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger_pipleine2')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pipeline2",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"servername": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_servername')]",
+							"dbname": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_dbname')]",
+							"username": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_username')]",
+							"password": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_password')]",
+							"schmnm": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_schmnm')]",
+							"mtdt_tbl_nm": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_mtdt_tbl_nm')]",
+							"mastr_cntrl_tbl": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_mastr_cntrl_tbl')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 60,
+						"startTime": "2025-05-17T10:20:00",
+						"endTime": "2025-05-17T16:46:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline2')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/cache_sink_implementation')]",

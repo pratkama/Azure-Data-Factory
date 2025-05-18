@@ -53,6 +53,27 @@
 		"temp_staging_properties_typeProperties_url": {
 			"value": "https://datalakepratikdp203.dfs.core.windows.net/"
 		},
+		"trigger_pipleine2_properties_pipeline2_parameters_servername": {
+			"value": "pratiksqldb.database.windows.net"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_dbname": {
+			"value": "pratik_test_db"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_username": {
+			"value": "pratiksqldb"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_password": {
+			"value": "Pratik@123"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_schmnm": {
+			"value": "SalesLT"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_mtdt_tbl_nm": {
+			"value": "mtdt_retrive_query"
+		},
+		"trigger_pipleine2_properties_pipeline2_parameters_mastr_cntrl_tbl": {
+			"value": "master_cntrl_tbl"
+		},
 		"containerUri": {
 			"value": ""
 		},
