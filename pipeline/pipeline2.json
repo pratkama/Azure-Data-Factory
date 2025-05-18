@@ -98,7 +98,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat(item().query_txt,' where ',item().query_cond,' >= ',variables('reporting_end_dt'))",
+										"value": "@concat(item().query_txt,' where ',item().query_cond,' >=','''',variables('reporting_end_dt'),'''')",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -261,7 +261,7 @@
 							"typeProperties": {
 								"variableName": "reporting_end_dt",
 								"value": {
-									"value": "\\'@{activity('lkp_get_reporting_dt').output.firstRow.reporting_end_dt}\\'",
+									"value": "@{activity('lkp_get_reporting_dt').output.firstRow.reporting_end_dt}",
 									"type": "Expression"
 								}
 							}
