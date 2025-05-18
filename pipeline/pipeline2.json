@@ -80,7 +80,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Set variable1",
+									"activity": "set_start_dt",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -98,7 +98,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat(item().query_txt,' where ',item().query_cond,' >=','''',variables('reporting_end_dt'),'''')",
+										"value": "@concat(item().query_txt,' where ',item().query_cond,' >=','''',variables('reporting_start_dt'),'''',' and ',item().query_cond,'<','''',variables('reporting_end_dt'))",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -243,7 +243,7 @@
 							}
 						},
 						{
-							"name": "Set variable1",
+							"name": "set_end_dt",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -262,6 +262,30 @@
 								"variableName": "reporting_end_dt",
 								"value": {
 									"value": "@{activity('lkp_get_reporting_dt').output.firstRow.reporting_end_dt}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "set_start_dt",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "set_end_dt",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "reporting_start_dt",
+								"value": {
+									"value": "@concat(substring(activity('lkp_get_reporting_dt').output.firstRow.reporting_end_dt,1,8),'01')",
 									"type": "Expression"
 								}
 							}
@@ -301,6 +325,9 @@
 		},
 		"variables": {
 			"reporting_end_dt": {
+				"type": "String"
+			},
+			"reporting_start_dt": {
 				"type": "String"
 			}
 		},
