@@ -1352,7 +1352,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(item().query_txt,' where ',item().query_cond,' >= ','''',activity('lkp_get_reporting_dt').output.value)",
+												"value": "@concat(item().query_txt,' where ',item().query_cond,' >= ','''',activity('lkp_get_reporting_dt').output.value,'''')",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -1457,7 +1457,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat('select CONVERT(char(10),reporting_end_dt,126) from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
+												"value": "@concat('select CONVERT(char(10),reporting_end_dt,126) as reporting_end_dt from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mastr_cntrl_tbl)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
