@@ -261,7 +261,7 @@
 							"typeProperties": {
 								"variableName": "reporting_end_dt",
 								"value": {
-									"value": "\\'@{activity('lkp_get_reporting_dt').output.firstRow}\\'",
+									"value": "\\'@{activity('lkp_get_reporting_dt').output.firstRow.reporting_end_dt}\\'",
 									"type": "Expression"
 								}
 							}
