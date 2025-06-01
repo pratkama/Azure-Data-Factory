@@ -176,7 +176,33 @@
 							"inputs": [
 								{
 									"referenceName": "azure_dynamic_sql_ds",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"servername": {
+											"value": "@pipeline().parameters.servername",
+											"type": "Expression"
+										},
+										"dbname": {
+											"value": "@pipeline().parameters.dbname",
+											"type": "Expression"
+										},
+										"username": {
+											"value": "@pipeline().parameters.username",
+											"type": "Expression"
+										},
+										"password": {
+											"value": "@pipeline().parameters.password",
+											"type": "Expression"
+										},
+										"schemaname": {
+											"value": "@pipeline().parameters.schmnm",
+											"type": "Expression"
+										},
+										"tablenm": {
+											"value": "@pipeline().parameters.src_tbl_nm",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
