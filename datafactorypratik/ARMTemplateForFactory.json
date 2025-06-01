@@ -1888,7 +1888,40 @@
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
-										"parameters": {}
+										"parameters": {
+											"servername": {
+												"value": "@pipeline().parameters.servername",
+												"type": "Expression"
+											},
+											"dbname": {
+												"value": "@pipeline().parameters.dbname",
+												"type": "Expression"
+											},
+											"username": {
+												"value": "@pipeline().parameters.username",
+												"type": "Expression"
+											},
+											"password": {
+												"value": "@pipeline().parameters.password",
+												"type": "Expression"
+											},
+											"schmnm": {
+												"value": "@pipeline().parameters.schmnm",
+												"type": "Expression"
+											},
+											"mtdt_tbl_nm": {
+												"value": "@pipeline().parameters.mtdt_tbl_nm",
+												"type": "Expression"
+											},
+											"mastr_cntrl_tbl": {
+												"value": "@pipeline().parameters.mastr_cntrl_tbl",
+												"type": "Expression"
+											},
+											"scd2_lkp_tbl_nm": {
+												"value": "@pipeline().parameters.scd2_lkp_tbl_nm",
+												"type": "Expression"
+											}
+										}
 									}
 								}
 							]
