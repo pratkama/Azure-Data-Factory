@@ -723,123 +723,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/master_pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select is_scd2_load from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm, ' where actv_ind = ''Y''')",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "azure_dynamic_sql_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"servername": {
-										"value": "@pipeline().parameters.servername",
-										"type": "Expression"
-									},
-									"dbname": {
-										"value": "@pipeline().parameters.dbname",
-										"type": "Expression"
-									},
-									"username": {
-										"value": "@pipeline().parameters.username",
-										"type": "Expression"
-									},
-									"password": {
-										"value": "@pipeline().parameters.password",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schmnm",
-										"type": "Expression"
-									},
-									"tablenm": {
-										"value": "@pipeline().parameters.mtdt_tbl_nm",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(activity('Lookup1').output.value,'Y')",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"servername": {
-						"type": "string"
-					},
-					"dbname": {
-						"type": "string"
-					},
-					"username": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"schmnm": {
-						"type": "string"
-					},
-					"src_tblnm": {
-						"type": "string"
-					},
-					"tgt_tblnm": {
-						"type": "string"
-					},
-					"mtdt_tbl_nm": {
-						"type": "string"
-					},
-					"mastr_cntrl_tbl": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/parametrizepipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2733,6 +2616,71 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/dataflow_SalesFact')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/excutepipelinedemo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute Pipeline1",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "parametrizepipeline",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"sourcetable": {
+									"value": "@pipeline().parameters.SourceTable",
+									"type": "Expression"
+								},
+								"dbnamefrompipeline": {
+									"value": "@pipeline().parameters.DBname",
+									"type": "Expression"
+								},
+								"destinationtbl": {
+									"value": "@pipeline().parameters.DestTable",
+									"type": "Expression"
+								},
+								"schemaname": {
+									"value": "@pipeline().parameters.schemaname",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"DBname": {
+						"type": "string",
+						"defaultValue": "DailySales"
+					},
+					"SourceTable": {
+						"type": "string"
+					},
+					"DestTable": {
+						"type": "string"
+					},
+					"schemaname": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/parametrizepipeline')]"
 			]
 		}
 	]

@@ -1207,7 +1207,7 @@
 						}
 					},
 					{
-						"name": "If Condition1",
+						"name": "if_scd2_load",
 						"type": "IfCondition",
 						"dependsOn": [
 							{
@@ -1222,7 +1222,26 @@
 							"expression": {
 								"value": "@equals(activity('Lookup1').output.value,'Y')",
 								"type": "Expression"
-							}
+							},
+							"ifTrueActivities": [
+								{
+									"name": "is_scd2_pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "is_scd2_pipeline",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -1261,7 +1280,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]"
+				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]",
+				"[concat(variables('factoryId'), '/pipelines/is_scd2_pipeline')]"
 			]
 		},
 		{
