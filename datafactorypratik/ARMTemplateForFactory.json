@@ -1925,6 +1925,9 @@
 					},
 					"mastr_cntrl_tbl": {
 						"type": "string"
+					},
+					"scd2_lkp_tbl_nm": {
+						"type": "string"
 					}
 				},
 				"annotations": []
