@@ -71,31 +71,31 @@
 			"type": "string",
 			"defaultValue": "https://datalakepratikdp203.dfs.core.windows.net/"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_servername": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_servername": {
 			"type": "string",
 			"defaultValue": "pratiksqldb.database.windows.net"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_dbname": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_dbname": {
 			"type": "string",
 			"defaultValue": "pratik_test_db"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_username": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_username": {
 			"type": "string",
 			"defaultValue": "pratiksqldb"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_password": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_password": {
 			"type": "string",
 			"defaultValue": "Pratik@123"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_schmnm": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_schmnm": {
 			"type": "string",
 			"defaultValue": "SalesLT"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_mtdt_tbl_nm": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_mtdt_tbl_nm": {
 			"type": "string",
 			"defaultValue": "mtdt_retrive_query"
 		},
-		"trigger_pipleine2_properties_pipeline2_parameters_mastr_cntrl_tbl": {
+		"trigger_pipleine2_properties_is_cycle_dt_load_parameters_mastr_cntrl_tbl": {
 			"type": "string",
 			"defaultValue": "master_cntrl_tbl"
 		}
@@ -1146,251 +1146,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/master_pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select is_scd2_load from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm, ' where actv_ind = ''Y''')",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "azure_dynamic_sql_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"servername": {
-										"value": "@pipeline().parameters.servername",
-										"type": "Expression"
-									},
-									"dbname": {
-										"value": "@pipeline().parameters.dbname",
-										"type": "Expression"
-									},
-									"username": {
-										"value": "@pipeline().parameters.username",
-										"type": "Expression"
-									},
-									"password": {
-										"value": "@pipeline().parameters.password",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schmnm",
-										"type": "Expression"
-									},
-									"tablenm": {
-										"value": "@pipeline().parameters.mtdt_tbl_nm",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "if_scd2_load",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(activity('Lookup1').output.value,'Y')",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "is_scd2_pipeline",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "is_scd2_pipeline",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"servername": {
-						"type": "string"
-					},
-					"dbname": {
-						"type": "string"
-					},
-					"username": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"schmnm": {
-						"type": "string"
-					},
-					"src_tblnm": {
-						"type": "string"
-					},
-					"tgt_tblnm": {
-						"type": "string"
-					},
-					"mtdt_tbl_nm": {
-						"type": "string"
-					},
-					"mastr_cntrl_tbl": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]",
-				"[concat(variables('factoryId'), '/pipelines/is_scd2_pipeline')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/parametrizepipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "SqlServerSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"tableOption": "autoCreate"
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "datasetsqltable",
-								"type": "DatasetReference",
-								"parameters": {
-									"tablename": {
-										"value": "@pipeline().parameters.sourcetable",
-										"type": "Expression"
-									},
-									"dbnamescope": {
-										"value": "@pipeline().parameters.dbnamefrompipeline",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schemaname",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "datasetsqltable",
-								"type": "DatasetReference",
-								"parameters": {
-									"tablename": {
-										"value": "@pipeline().parameters.destinationtbl",
-										"type": "Expression"
-									},
-									"dbnamescope": {
-										"value": "@pipeline().parameters.dbnamefrompipeline",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schemaname",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"sourcetable": {
-						"type": "string"
-					},
-					"dbnamefrompipeline": {
-						"type": "string"
-					},
-					"destinationtbl": {
-						"type": "string"
-					},
-					"schemaname": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/datasetsqltable')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"name": "[concat(parameters('factoryName'), '/is_cycle_dt_load')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1731,6 +1487,537 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/is_scd2_pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "lkp_tbl_cond",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select query_txt,query_cond,src_tbl_nm,tgt_tbl_nm from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm,' where is_scd2_load = ''Y'' and actv_ind = ''Y''')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "azure_dynamic_sql_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"servername": {
+										"value": "@pipeline().parameters.servername",
+										"type": "Expression"
+									},
+									"dbname": {
+										"value": "@pipeline().parameters.dbname",
+										"type": "Expression"
+									},
+									"username": {
+										"value": "@pipeline().parameters.username",
+										"type": "Expression"
+									},
+									"password": {
+										"value": "@pipeline().parameters.password",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schmnm",
+										"type": "Expression"
+									},
+									"tablenm": {
+										"value": "@pipeline().parameters.mtdt_tbl_nm",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "foreach",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "lkp_tbl_cond",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('lkp_tbl_cond').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "lkp_scd2_tbl",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat('select adt_timestamp from ',pipeline().parameters.schmnm,'.',pipeline().parameters.scd2_lkp_tbl_nm,' where src_tbl_nm = ','''',item().src_tbl_nm,'''')",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "azure_dynamic_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"servername": {
+													"value": "@pipeline().parameters.servername",
+													"type": "Expression"
+												},
+												"dbname": {
+													"value": "@pipeline().parameters.dbname",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().parameters.username",
+													"type": "Expression"
+												},
+												"password": {
+													"value": "@pipeline().parameters.password",
+													"type": "Expression"
+												},
+												"schemaname": {
+													"value": "@pipeline().parameters.schmnm",
+													"type": "Expression"
+												},
+												"tablenm": {
+													"value": "@pipeline().parameters.scd2_lkp_tbl_nm",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								},
+								{
+									"name": "copy_data",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "lkp_scd2_tbl",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat(item().query_txt,' where ',item().query_cond,' > ','''',activity('lkp_scd2_tbl').output.firstRow,'''')",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "azure_dynamic_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"servername": {
+													"value": "@pipeline().parameters.servername",
+													"type": "Expression"
+												},
+												"dbname": {
+													"value": "@pipeline().parameters.dbname",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().parameters.username",
+													"type": "Expression"
+												},
+												"password": {
+													"value": "@pipeline().parameters.password",
+													"type": "Expression"
+												},
+												"schemaname": {
+													"value": "@pipeline().parameters.schmnm",
+													"type": "Expression"
+												},
+												"tablenm": {
+													"value": "@pipeline().parameters.src_tbl_nm",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "azure_dynamic_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"servername": {
+													"value": "@pipeline().parameters.servername",
+													"type": "Expression"
+												},
+												"dbname": {
+													"value": "@pipeline().parameters.dbname",
+													"type": "Expression"
+												},
+												"username": {
+													"value": "@pipeline().parameters.username",
+													"type": "Expression"
+												},
+												"password": {
+													"value": "@pipeline().parameters.password",
+													"type": "Expression"
+												},
+												"schemaname": {
+													"value": "@pipeline().parameters.schmnm",
+													"type": "Expression"
+												},
+												"tablenm": {
+													"value": "item().tgt_tbl_nm",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"servername": {
+						"type": "string"
+					},
+					"dbname": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"schmnm": {
+						"type": "string"
+					},
+					"mtdt_tbl_nm": {
+						"type": "string"
+					},
+					"mastr_cntrl_tbl": {
+						"type": "string"
+					},
+					"src_tbl_nm": {
+						"type": "string"
+					},
+					"tgt_tbl_nm": {
+						"type": "string"
+					},
+					"scd2_lkp_tbl_nm": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/master_pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select is_scd2_load from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm, ' where actv_ind = ''Y''')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "azure_dynamic_sql_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"servername": {
+										"value": "@pipeline().parameters.servername",
+										"type": "Expression"
+									},
+									"dbname": {
+										"value": "@pipeline().parameters.dbname",
+										"type": "Expression"
+									},
+									"username": {
+										"value": "@pipeline().parameters.username",
+										"type": "Expression"
+									},
+									"password": {
+										"value": "@pipeline().parameters.password",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schmnm",
+										"type": "Expression"
+									},
+									"tablenm": {
+										"value": "@pipeline().parameters.mtdt_tbl_nm",
+										"type": "Expression"
+									}
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "if_scd2_load",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(activity('Lookup1').output.value,'Y')",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "is_scd2_pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "is_scd2_pipeline",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"servername": {
+						"type": "string"
+					},
+					"dbname": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"schmnm": {
+						"type": "string"
+					},
+					"src_tblnm": {
+						"type": "string"
+					},
+					"tgt_tblnm": {
+						"type": "string"
+					},
+					"mtdt_tbl_nm": {
+						"type": "string"
+					},
+					"mastr_cntrl_tbl": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]",
+				"[concat(variables('factoryId'), '/pipelines/is_scd2_pipeline')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/parametrizepipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SqlServerSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "datasetsqltable",
+								"type": "DatasetReference",
+								"parameters": {
+									"tablename": {
+										"value": "@pipeline().parameters.sourcetable",
+										"type": "Expression"
+									},
+									"dbnamescope": {
+										"value": "@pipeline().parameters.dbnamefrompipeline",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schemaname",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "datasetsqltable",
+								"type": "DatasetReference",
+								"parameters": {
+									"tablename": {
+										"value": "@pipeline().parameters.destinationtbl",
+										"type": "Expression"
+									},
+									"dbnamescope": {
+										"value": "@pipeline().parameters.dbnamefrompipeline",
+										"type": "Expression"
+									},
+									"schemaname": {
+										"value": "@pipeline().parameters.schemaname",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"sourcetable": {
+						"type": "string"
+					},
+					"dbnamefrompipeline": {
+						"type": "string"
+					},
+					"destinationtbl": {
+						"type": "string"
+					},
+					"schemaname": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/datasetsqltable')]"
 			]
 		},
 		{
@@ -3942,17 +4229,17 @@
 				"pipelines": [
 					{
 						"pipelineReference": {
-							"referenceName": "pipeline2",
+							"referenceName": "is_cycle_dt_load",
 							"type": "PipelineReference"
 						},
 						"parameters": {
-							"servername": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_servername')]",
-							"dbname": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_dbname')]",
-							"username": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_username')]",
-							"password": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_password')]",
-							"schmnm": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_schmnm')]",
-							"mtdt_tbl_nm": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_mtdt_tbl_nm')]",
-							"mastr_cntrl_tbl": "[parameters('trigger_pipleine2_properties_pipeline2_parameters_mastr_cntrl_tbl')]"
+							"servername": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_servername')]",
+							"dbname": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_dbname')]",
+							"username": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_username')]",
+							"password": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_password')]",
+							"schmnm": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_schmnm')]",
+							"mtdt_tbl_nm": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_mtdt_tbl_nm')]",
+							"mastr_cntrl_tbl": "[parameters('trigger_pipleine2_properties_is_cycle_dt_load_parameters_mastr_cntrl_tbl')]"
 						}
 					}
 				],
@@ -3968,7 +4255,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pipeline2')]"
+				"[concat(variables('factoryId'), '/pipelines/is_cycle_dt_load')]"
 			]
 		},
 		{
@@ -4801,293 +5088,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Json1')]",
 				"[concat(variables('factoryId'), '/datasets/customerjsontable')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/is_scd2_pipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "lkp_tbl_cond",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select query_txt,query_cond,src_tbl_nm,tgt_tbl_nm from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm,' where is_scd2_load = ''Y'' and actv_ind = ''Y''')",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "azure_dynamic_sql_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"servername": {
-										"value": "@pipeline().parameters.servername",
-										"type": "Expression"
-									},
-									"dbname": {
-										"value": "@pipeline().parameters.dbname",
-										"type": "Expression"
-									},
-									"username": {
-										"value": "@pipeline().parameters.username",
-										"type": "Expression"
-									},
-									"password": {
-										"value": "@pipeline().parameters.password",
-										"type": "Expression"
-									},
-									"schemaname": {
-										"value": "@pipeline().parameters.schmnm",
-										"type": "Expression"
-									},
-									"tablenm": {
-										"value": "@pipeline().parameters.mtdt_tbl_nm",
-										"type": "Expression"
-									}
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "foreach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "lkp_tbl_cond",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('lkp_tbl_cond').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "lkp_scd2_tbl",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat('select adt_timestamp from ',pipeline().parameters.schmnm,'.',pipeline().parameters.scd2_lkp_tbl_nm,' where src_tbl_nm = ','''',item().src_tbl_nm,'''')",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "azure_dynamic_sql_ds",
-											"type": "DatasetReference",
-											"parameters": {
-												"servername": {
-													"value": "@pipeline().parameters.servername",
-													"type": "Expression"
-												},
-												"dbname": {
-													"value": "@pipeline().parameters.dbname",
-													"type": "Expression"
-												},
-												"username": {
-													"value": "@pipeline().parameters.username",
-													"type": "Expression"
-												},
-												"password": {
-													"value": "@pipeline().parameters.password",
-													"type": "Expression"
-												},
-												"schemaname": {
-													"value": "@pipeline().parameters.schmnm",
-													"type": "Expression"
-												},
-												"tablenm": {
-													"value": "@pipeline().parameters.scd2_lkp_tbl_nm",
-													"type": "Expression"
-												}
-											}
-										}
-									}
-								},
-								{
-									"name": "copy_data",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "lkp_scd2_tbl",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat(item().query_txt,' where ',item().query_cond,' > ','''',activity('lkp_scd2_tbl').output.firstRow,'''')",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "azure_dynamic_sql_ds",
-											"type": "DatasetReference",
-											"parameters": {
-												"servername": {
-													"value": "@pipeline().parameters.servername",
-													"type": "Expression"
-												},
-												"dbname": {
-													"value": "@pipeline().parameters.dbname",
-													"type": "Expression"
-												},
-												"username": {
-													"value": "@pipeline().parameters.username",
-													"type": "Expression"
-												},
-												"password": {
-													"value": "@pipeline().parameters.password",
-													"type": "Expression"
-												},
-												"schemaname": {
-													"value": "@pipeline().parameters.schmnm",
-													"type": "Expression"
-												},
-												"tablenm": {
-													"value": "@pipeline().parameters.src_tbl_nm",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "azure_dynamic_sql_ds",
-											"type": "DatasetReference",
-											"parameters": {
-												"servername": {
-													"value": "@pipeline().parameters.servername",
-													"type": "Expression"
-												},
-												"dbname": {
-													"value": "@pipeline().parameters.dbname",
-													"type": "Expression"
-												},
-												"username": {
-													"value": "@pipeline().parameters.username",
-													"type": "Expression"
-												},
-												"password": {
-													"value": "@pipeline().parameters.password",
-													"type": "Expression"
-												},
-												"schemaname": {
-													"value": "@pipeline().parameters.schmnm",
-													"type": "Expression"
-												},
-												"tablenm": {
-													"value": "item().tgt_tbl_nm",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"servername": {
-						"type": "string"
-					},
-					"dbname": {
-						"type": "string"
-					},
-					"username": {
-						"type": "string"
-					},
-					"password": {
-						"type": "string"
-					},
-					"schmnm": {
-						"type": "string"
-					},
-					"mtdt_tbl_nm": {
-						"type": "string"
-					},
-					"mastr_cntrl_tbl": {
-						"type": "string"
-					},
-					"src_tbl_nm": {
-						"type": "string"
-					},
-					"tgt_tbl_nm": {
-						"type": "string"
-					},
-					"scd2_lkp_tbl_nm": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]"
 			]
 		}
 	]
