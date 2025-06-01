@@ -1,0 +1,227 @@
+{
+	"name": "is_scd2_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "lkp_tbl_cond",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select query_txt,query_cond,src_tbl_nm,tgt_tbl_nm from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm,' where is_scd2_load = ''Y'' and actv_ind = ''Y''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "azure_dynamic_sql_ds",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lkp_tbl_cond",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lkp_tbl_cond').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "lkp_scd2_tbl",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select adt_timestamp from ',pipeline().parameters.schmnm,'.',pipeline().parameters.scd2_lkp_tbl_nm,' where src_tbl_nm = ','''',item().src_tbl_nm,'''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "azure_dynamic_sql_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"servername": {
+											"value": "@pipeline().parameters.servername",
+											"type": "Expression"
+										},
+										"dbname": {
+											"value": "@pipeline().parameters.dbname",
+											"type": "Expression"
+										},
+										"username": {
+											"value": "@pipeline().parameters.username",
+											"type": "Expression"
+										},
+										"password": {
+											"value": "@pipeline().parameters.password",
+											"type": "Expression"
+										},
+										"schemaname": {
+											"value": "@pipeline().parameters.schmnm",
+											"type": "Expression"
+										},
+										"tablenm": {
+											"value": "@pipeline().parameters.scd2_lkp_tbl_nm",
+											"type": "Expression"
+										}
+									}
+								}
+							}
+						},
+						{
+							"name": "copy_data",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "lkp_scd2_tbl",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat(item().query_txt,' where ',item().query_cond,' > ','''',activity('lkp_scd2_tbl').output.firstRow,'''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "azure_dynamic_sql_ds",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "azure_dynamic_sql_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"servername": {
+											"value": "@pipeline().parameters.servername",
+											"type": "Expression"
+										},
+										"dbname": {
+											"value": "@pipeline().parameters.dbname",
+											"type": "Expression"
+										},
+										"username": {
+											"value": "@pipeline().parameters.username",
+											"type": "Expression"
+										},
+										"password": {
+											"value": "@pipeline().parameters.password",
+											"type": "Expression"
+										},
+										"schemaname": {
+											"value": "@pipeline().parameters.schmnm",
+											"type": "Expression"
+										},
+										"tablenm": {
+											"value": "item().tgt_tbl_nm",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"servername": {
+				"type": "string"
+			},
+			"dbname": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			},
+			"schmnm": {
+				"type": "string"
+			},
+			"mtdt_tbl_nm": {
+				"type": "string"
+			},
+			"mastr_cntrl_tbl": {
+				"type": "string"
+			},
+			"src_tbl_nm": {
+				"type": "string"
+			},
+			"tgt_tbl_nm": {
+				"type": "string"
+			},
+			"scd2_lkp_tbl_nm": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}
