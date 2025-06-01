@@ -1854,6 +1854,25 @@
 								"value": "@equals(activity('Lookup1').output.value,'Y')",
 								"type": "Expression"
 							},
+							"ifFalseActivities": [
+								{
+									"name": "is_cycle_dt_load",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "is_cycle_dt_load",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							],
 							"ifTrueActivities": [
 								{
 									"name": "is_scd2_pipeline",
@@ -1912,6 +1931,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/azure_dynamic_sql_ds')]",
+				"[concat(variables('factoryId'), '/pipelines/is_cycle_dt_load')]",
 				"[concat(variables('factoryId'), '/pipelines/is_scd2_pipeline')]"
 			]
 		},
