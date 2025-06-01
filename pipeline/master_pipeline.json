@@ -1,0 +1,85 @@
+{
+	"name": "master_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select is_scd2_load from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm, ' where actv_ind = ''Y''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "azure_dynamic_sql_ds",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('Lookup1').output.value,'Y')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"servername": {
+				"type": "string"
+			},
+			"dbname": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			},
+			"schmnm": {
+				"type": "string"
+			},
+			"src_tblnm": {
+				"type": "string"
+			},
+			"tgt_tblnm": {
+				"type": "string"
+			},
+			"mtdt_tbl_nm": {
+				"type": "string"
+			},
+			"mastr_cntrl_tbl": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}
