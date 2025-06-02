@@ -108,7 +108,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select is_scd2_load from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm, ' where actv_ind = ''Y''')",
+									"value": "@concat('select src_tbl_nm,is_scd2_load from ',pipeline().parameters.schmnm,'.',pipeline().parameters.mtdt_tbl_nm, ' where actv_ind = ''Y''')",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",

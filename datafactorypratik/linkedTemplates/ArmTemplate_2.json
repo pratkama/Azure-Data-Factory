@@ -1194,7 +1194,8 @@
 													"type": "Expression"
 												}
 											}
-										}
+										},
+										"firstRowOnly": true
 									}
 								},
 								{
@@ -1202,7 +1203,7 @@
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "lkp_scd2_tbl",
+											"activity": "Set variable1",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1220,7 +1221,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat(item().query_txt,' where ',item().query_cond,' > ','''',activity('lkp_scd2_tbl').output.firstRow,'''')",
+												"value": "@concat(item().query_txt,' where ',item().query_cond,' > ','''',variables('timestamp'),'''')",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -1305,6 +1306,30 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "lkp_scd2_tbl",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "timestamp",
+										"value": {
+											"value": "@formatDateTime(activity('lkp_scd2_tbl').output.firstRow,'yyyy-mm-dd hh:mm:ss')",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -1343,6 +1368,11 @@
 					},
 					"scd2_lkp_tbl_nm": {
 						"type": "string"
+					}
+				},
+				"variables": {
+					"timestamp": {
+						"type": "String"
 					}
 				},
 				"annotations": []
